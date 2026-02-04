@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.domain.mapper.UserMapper">
+
+    <select id="findBySocial" resultType="com.example.demo.domain.User">
+        SELECT
+        id,
+        email,
+        password,
+        nickname,
+        created_at AS createdAt,
+        social_type_code AS socialTypeCode,
+        social_id AS socialId,
+        tone_type AS toneType
+        FROM users
+        WHERE social_type_code = #{socialTypeCode}
+        AND social_id = #{socialId}
+        LIMIT 1
+    </select>
+
+    <insert id="insertUser" parameterType="com.example.demo.domain.User" useGeneratedKeys="true" keyProperty="id">
+        INSERT INTO
+        users(email, password, nickname, social_type_code, social_id)
+        VALUES
+        (#{email}, #{password}, #{nickname}, #{socialTypeCode}, #{socialId})
+    </insert>
+
+    <update id="updateUser" parameterType="com.example.demo.domain.User">
+        UPDATE users
+        SET email = #{email},
+        nickname = #{nickname}
+        WHERE id = #{id}
+    </update>
+
+</mapper>
