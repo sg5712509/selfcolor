@@ -41,12 +41,9 @@ public class HomeController {
             banner = new Banner();
         }
 
-        // 날씨별 이미지
-        int weatherCode = 4; // 기본값(맑음). 실제론 weatherService 결과로 세팅
+        int weatherCode = 4;
         banner.setImageUrl(weatherBannerService.getBannerImageUrl(weatherCode));
-        // banner 의 imageUrl 을 수정한다. (weatherBannerService 의 getBannerImageUrl 메서드의 값을 넣는다.)
 
-        // ✅ 시간 별 이미지 선택 (Asia/Seoul)
         int imgNo = bannerService.getBannerImageNo();
         imgNo = Math.max(1, Math.min(imgNo, 6)); // 안전장치
         banner.setLeftImage("/images/time/" + imgNo + ".png");
@@ -68,11 +65,10 @@ public class HomeController {
         model.addAttribute("loginUserId", session.getAttribute("LOGIN_USER_ID"));
         model.addAttribute("loginNickname", session.getAttribute("LOGIN_NICKNAME"));
 
-        // home() 안의 날씨 부분만 이렇게
-        WeatherDto weatherDto = new WeatherDto(0, "현재 위치", 1, 0);
-        model.addAttribute("weather", weatherDto);
+        WeatherDto weatherDto = new WeatherDto(0, "현재 위치", 1, 0); // view 가 깨지지 않게 해주는 코드
+        model.addAttribute("weather", weatherDto); // weather 란 이름으로 html 에 전달
 
-        return "home";
+        return "index";
     }
 
     private final CustomPropertyConfig customPropertyConfig;
@@ -82,26 +78,31 @@ public class HomeController {
     public RedirectView kakaoStart() {
         String url = "https://kauth.kakao.com/oauth/authorize"
                 + "?client_id=" + enc(customPropertyConfig.getKakaoClientId())
-                // properties 에서
+                // 내 서버에 적혀져있는 식별자. client_id 는 카카오 개발자 페이지에도 등록 되어 있다.
                 // custom.property.kakao-client-id=6663d2506ab9bb404884c489cbe3bf9e
                 + "&redirect_uri=" + enc(customPropertyConfig.getKakaoRedirectUri())
-                // properties 에서
+                // 내 서버에 있는 리다이렉트 주소 (카카오 개발자 페이지에도 등록)
                 // custom.property.kakao-redirect-uri=http://localhost:8080/user/login/kakao
                 + "&response_type=code"
 
                 + "&prompt=login";
+                // 무조건 로그인 화면 표시
 
         return new RedirectView(url);
-
+        // 이 url 로 이동 해라
     }
 
     @GetMapping("/user/login/kakao")
     public String kakaoCallback(
-            @RequestParam(value = "code", required = false) String code, /*카카오가 준 인가 코드*/
+            @RequestParam(value = "code", required = false) String code,
+            /*카카오가 준 인가 코드*/
             // &response_type=code 로 카카오에게 요청한 인가 코드가 이곳에 적혀 있다.
-            HttpSession session, /* session */
-            @RequestParam(value = "error", required = false) String error,  /*?error=access_denied 인 상황을 가져온다*/
-            @RequestParam(value = "error_description", required = false) String errorDesc /*에러 상세 설명*/) {
+            HttpSession session,
+            /* session */
+            @RequestParam(value = "error", required = false) String error,
+            /*?error=access_denied 인 상황을 가져온다*/
+            @RequestParam(value = "error_description", required = false) String errorDesc
+            /*에러 상세 설명*/) {
 
         // 1) 카카오 로그인 실패 or 취소한 경우
         if (error != null) {
@@ -129,7 +130,7 @@ public class HomeController {
 
         String nickname = null;
 
-        // 6) 닉네임 추출
+        // 6) 이름 추출
         if (profile.getKakao_account() != null && profile.getKakao_account().getProfile() != null) {
             nickname = profile.getKakao_account().getProfile().getNickname();
         }
@@ -151,6 +152,7 @@ public class HomeController {
     public RedirectView logout(HttpSession session) {
         session.invalidate(); // 세션 통째로 폐기
 
+        // "https://kauth.kakao.com/oauth/logout" : 카카오 개발자 문서에 적혀 있는 OAuth 로그아웃 엔드포인트이다.
         String url = "https://kauth.kakao.com/oauth/logout"
                 + "?client_id=" + enc(customPropertyConfig.getKakaoClientId())
                 + "&logout_redirect_uri=" + enc("http://localhost:8080/");
