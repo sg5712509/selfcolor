@@ -2076,71 +2076,85 @@
 
     // 위의 함수에서 전달받은 데이터를 여기서 쓴다.
     // 이 함수에서는 실제 JSON 에 적혀있는 temp, location, sky, pty 를 받는다.
-    function renderWeather({temp, location, sky, pty}) {
-        document.getElementById("weatherTemp").textContent =
-            (!(temp === null || temp === undefined)) ? `${Math.round(Number(temp))}°` : "--°";
+    function renderWeatherOverlay({ temp, location, SKY, PTY }) {
 
-        document.getElementById("weatherLoc").textContent = location ?? "현재 위치";
-        // id 가 weatherLoc 인 태그 안의 텍스트는 location 으로 대체, 만약 undefined 이거나 null 이라면 '현재 위치' 글씨 띄움
+        const tempEl = document.getElementById("weatherTemp");
+        const locEl = document.getElementById("weatherLoc");
+        const iconEl = document.getElementById("weatherIcon");
+        const descEl = document.getElementById("weatherDesc");
 
-        const w = pickWeatherIcon({SKY: sky, PTY: pty});
-        // 밑에 있는 아이콘을 정하는 메서드에 sky, pty 값을 각각 SKY, PTY 에 주입하고 받은 결과를 w 에 담는다.
+        if (tempEl)
+            tempEl.textContent =
+                (temp !== null && temp !== undefined)
+                    ? `${Math.round(Number(temp))}°`
+                    : "--°";
 
-        const imgUrl = pickWeatherBannerImageUrl({SKY: sky, PTY: pty});
-        // 밑에 있는 날씨배너의 이미지를 정하는 메서드에 sky, pty 값을 각각 SKY, PTY 에 주입하고 받은 결과를 w 에 담는다.
+        if (locEl)
+            locEl.textContent = location ?? "현재 위치";
 
-        document.getElementById("weatherIcon").textContent = w.icon;
-        // id 가 weatherIcon 인 태그에서 안의 텍스트를 w 의 아이콘으로 바꾼다.
+        const weather = pickWeatherIcon({ SKY, PTY });
 
-        document.getElementById("weatherDesc").textContent = w.desc;
-        // id 가 weatherDesc 인 태그에서 안의 텍스트를 w 의 desc 으로 바꾼다. (ex) 비/눈)
-        // desc: description 의 줄임말
+        if (iconEl) iconEl.textContent = weather.icon;
+        if (descEl) descEl.textContent = weather.desc;
+    }
+
+    function pickWeatherIcon({ SKY, PTY }) {
+
+        const pty = Number(PTY ?? 0);
+        const sky = Number(SKY ?? 1);
+
+        if ([1,4,5].includes(pty))
+            return { icon: "☔️", desc: "비" };
+
+        if ([2,6].includes(pty))
+            return { icon: "🌨️", desc: "비/눈" };
+
+        if ([3,7].includes(pty))
+            return { icon: "❄️", desc: "눈" };
+
+        if (sky === 1)
+            return { icon: "☀️", desc: "맑음" };
+
+        if (sky === 3)
+            return { icon: "☁️", desc: "구름많음" };
+
+        return { icon: "☁️", desc: "흐림" };
+    }
+
+
+
+    function updateWeatherBanner({ SKY, PTY }) {
 
         const imgEl = document.getElementById("weatherBannerImg");
-        // id 가 weatherBannerImg 인 태그를 상수 imgEl 에 담는다.
+        if (!imgEl) return;
 
-        if (imgEl) imgEl.src = imgUrl;
-        // 위에서 만든 상수 imgEl 가 true 라면 id 가 weatherBannerImg 인 태그 (여기선 imgEl) 의 속성 src 가 pickWeatherBannerImageUrl 의 함수안에 결과 값인 사진이 된다.
-    }
-
-    // SKY: 1 맑음, 3 구름많음, 4 흐림
-    // PTY: 0 없음, 1 비, 2 비/눈, 3 눈, 4 소나기, 5~7(초단기)
-    // 이 함수는 객체를 받는다 SKY: "", PtY: "" 꼴로 되어있는 객체를 받는다.
-    function pickWeatherIcon({SKY, PTY}) {
-        // 객체 하나 받음
-        // 그 안에서 SKY, PTY 만 사용
-        // 호출 예 : pickWeatherIcon({SKY: 1, PTY: 0})
         const pty = Number(PTY ?? 0);
         const sky = Number(SKY ?? 1);
-        // PTY 가 없으면 -> 0 (강수 없음)
-        // SKY 가 없으면 -> 1 (맑음)
-        // 문자열이어도 숫자로 강제 변환
 
-        if (pty === 1 || pty === 4 || pty === 5) return {icon: "☔️", desc: "비"};
-        if (pty === 2 || pty === 6) return {icon: "🌨️", desc: "비/눈"};
-        if (pty === 3 || pty === 7) return {icon: "❄️", desc: "눈"};
+        let img = "images/weather/4.png";
 
-        if (sky === 1) return {icon: "☀️", desc: "맑음"};
-        if (sky === 3) return {icon: "☁️", desc: "구름많음"};
-        return {icon: "☁️", desc: "흐림"}; // else
+        if ([1,4,5].includes(pty)) img = "images/weather/1.png";
+        else if ([2,6].includes(pty)) img = "images/weather/2.png";
+        else if ([3,7].includes(pty)) img = "images/weather/3.png";
+        else if (sky === 3) img = "images/weather/5.png";
+        else if (sky === 4) img = "images/weather/6.png";
+
+        imgEl.src = img;
     }
 
-    // 이 함수는 SKY: "", PtY: "" 꼴로 되어있는 객체를 받는다.
-    function pickWeatherBannerImageUrl({SKY, PTY}) {
-        const pty = Number(PTY ?? 0);
-        const sky = Number(SKY ?? 1);
-        // PTY 가 없으면 -> 0 (강수 없음)
-        // SKY 가 없으면 -> 1 (맑음)
-        // 문자열이어도 숫자로 강제 변환
+    function renderWeather(data) {
 
-        // 1) 비 2) 비/눈 3) 눈 4) 맑음 5) 구름많음 6) 흐림
-        if (pty === 1 || pty === 4 || pty === 5) return "/images/weather/1.png";  // 비
-        if (pty === 2 || pty === 6) return "/images/weather/2.png";               // 비/눈
-        if (pty === 3 || pty === 7) return "/images/weather/3.png";               // 눈
+        renderWeatherOverlay({
+            temp: data.temp,
+            location: data.location,
+            SKY: data.sky,
+            PTY: data.pty
+        });
 
-        if (sky === 1) return "/images/weather/4.png"; // 맑음
-        if (sky === 3) return "/images/weather/5.png"; // 구름많음
-        else return "/images/weather/6.png";                // 흐림
+        updateWeatherBanner({
+            SKY: data.sky,
+            PTY: data.pty
+        });
     }
 
 
@@ -2329,3 +2343,4 @@
 </script>
 
 </html>
+
