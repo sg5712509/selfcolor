@@ -1442,17 +1442,17 @@
 
     // ======================날씨======================
 
-    document.addEventListener("DOMContentLoaded", loadWeatherByGeo);
-    /*HTML 다 읽자마자 loadWeatherByGeo 실행*/
-    /*페이지 열자마자 실행되게 하고 싶으면 씀*/
+/*    document.addEventListener("DOMContentLoaded", loadWeatherByGeo);
+    /!*HTML 다 읽자마자 loadWeatherByGeo 실행*!/
+    /!*페이지 열자마자 실행되게 하고 싶으면 씀*!/
 
     // async / await (비동기)
     // 시간이 걸리는 작업(위치 가져오기, 서버 요청)은 기다려야 결과가 나온다
     // await 는 "결과 나올 때까지 잠깐 기다려" 라는 뜻
     // async 는 "이 함수 안에서 await 쓸 거야" 라는 표시
     async function loadWeatherByGeo() {
-        /*loadWeatherByGeo 라는 함수 만들게*/
-        /*안에 시간이 걸리는 작업이 있어서(await) 기다릴 수도 있어 (그래서 async)*/
+        /!*loadWeatherByGeo 라는 함수 만들게*!/
+        /!*안에 시간이 걸리는 작업이 있어서(await) 기다릴 수도 있어 (그래서 async)*!/
         // 사용자의 현재 위치(위도/경도)를 브라우저에서 얻어서 서버(/weather)에 보내고 서버가 준 날씨 JSON 을 화면에 보여주는 코드
         // 시간이 걸리는 작업을 기다리면서도 브라우저가 멈추지 않게 하는 방식
         // 1) 웹페이지가 열림
@@ -1463,40 +1463,40 @@
         // 6) renderWeather(data) 가 그걸 화면에 그림
 
         if (!navigator.geolocation) return;
-        /*이 브라우저가 위치기능을 지원 안 하면 그냥 종료할게*/
+        /!*이 브라우저가 위치기능을 지원 안 하면 그냥 종료할게*!/
         // 브라우저가 위치정보 API 를 지원 안 하면 아무것도 안 하고 종료
         // navigator.geolocation (위치 가져오는 기능)
         // 브라우저가 제공하는 "내 위치" 기능
         // 휴대폰 GPS 또는 Wi-Fi/기지국으로 대충 추정함
         navigator.geolocation.getCurrentPosition(async (pos) => {
-            /*브라우저에게: 내 현재 위치 좀 가져와줘. 가져오면 그 결과를 pos라는 변수에 넣어서 이 함수(콜백)를 실행해줘*/
-            /*여기서 브라우저가 권한 팝업 띄움: 이 사이트가 위치정보를 사용하도록 허용할까요?*/
+            /!*브라우저에게: 내 현재 위치 좀 가져와줘. 가져오면 그 결과를 pos라는 변수에 넣어서 이 함수(콜백)를 실행해줘*!/
+            /!*여기서 브라우저가 권한 팝업 띄움: 이 사이트가 위치정보를 사용하도록 허용할까요?*!/
             // 현재 위치를 가져오고, 성공하면 pos 를 콜백으로 받음(콜백 자체도 async라 await 가능)
             const lat = pos.coords.latitude;
-            /*위치 결과 pos 안에는 좌표가 들어있어. 그중 latitude = 위도*/
+            /!*위치 결과 pos 안에는 좌표가 들어있어. 그중 latitude = 위도*!/
             // 받은 위치(pos)에서 위도(latitude) 꺼냄
 
             const lon = pos.coords.longitude;
-            /*longitude = 경도*/
+            /!*longitude = 경도*!/
             // 받은 위치(pos)에서 경도(longitude) 꺼냄
 
             // fetch (서버에 요청 보내기)
             // "서버야 데이터 줘" 하고 요청하는 함수
             const res = await fetch(`/weather?lat=${lat}&lon=${lon}`);
-            /*서버에 이런 주소로 요청 보내는 거: /weather?lat=37.123&lon=127.456 이런 느낌*/
-            /*?lat=...&lon=...은 쿼리스트링이라서 서버야, 이 좌표 기준으로 날씨 줘 라고 전달하는 방식*/
-            /*await 는 서버가 답할 때까지 기다려*/
+            /!*서버에 이런 주소로 요청 보내는 거: /weather?lat=37.123&lon=127.456 이런 느낌*!/
+            /!*?lat=...&lon=...은 쿼리스트링이라서 서버야, 이 좌표 기준으로 날씨 줘 라고 전달하는 방식*!/
+            /!*await 는 서버가 답할 때까지 기다려*!/
 
             // JSON (데이터 포맷)
             // 서버가 데이터를 보내는 대표적인 형태
             // 예: {temp: 12, city: "Seoul"} 이런 모양
             const data = await res.json();
-            /*서버가 준 응답(res)은 아직 “원시 응답”이라 바로 쓰기 불편해
+            /!*서버가 준 응답(res)은 아직 “원시 응답”이라 바로 쓰기 불편해
             .json()으로 “JSON 데이터를 자바스크립트 객체로 변환”
-            이것도 시간이 살짝 걸릴 수 있어서 await*/
+            이것도 시간이 살짝 걸릴 수 있어서 await*!/
 
             renderWeather(data); // 밑에 있는 함수가 바로 renderWeather 이다.
-            /*서버가 준 data를 renderWeather 에 그대로 넘김*/
+            /!*서버가 준 data를 renderWeather 에 그대로 넘김*!/
             // 서버 JSON 에 weatherCode 가 있으면 -> data.weatherCode 존재
             // 서버 JSON 에 weatherCode 가 없으면 -> data.weatherCode 없음
         });
@@ -1562,14 +1562,14 @@
         // 문자열이어도 숫자로 강제 변환
 
         // 1) 비 2) 비/눈 3) 눈 4) 맑음 5) 구름많음 6) 흐림
-        if (pty === 1 || pty === 4 || pty === 5) return "/images/weather/1.png";  // 비
-        if (pty === 2 || pty === 6) return "/images/weather/2.png";               // 비/눈
-        if (pty === 3 || pty === 7) return "/images/weather/3.png";               // 눈
+        if (pty === 1 || pty === 4 || pty === 5) return "images/weather/1.png";  // 비
+        if (pty === 2 || pty === 6) return "images/weather/2.png";               // 비/눈
+        if (pty === 3 || pty === 7) return "images/weather/3.png";               // 눈
 
-        if (sky === 1) return "/images/weather/4.png"; // 맑음
-        if (sky === 3) return "/images/weather/5.png"; // 구름많음
-        else return "/images/weather/6.png";                // 흐림
-    }
+        if (sky === 1) return "images/weather/4.png"; // 맑음
+        if (sky === 3) return "images/weather/5.png"; // 구름많음
+        else return "images/weather/6.png";                // 흐림
+    }*/
 
 
 
@@ -1751,6 +1751,93 @@
 
             alert(`저장 완료: ${tone} (총점 ${total})`);
             closeProfileModal();
+        });
+    }
+
+
+
+
+
+
+
+    function renderWeatherOverlay({ temp, location, SKY, PTY }) {
+
+        const tempEl = document.getElementById("weatherTemp");
+        const locEl = document.getElementById("weatherLoc");
+        const iconEl = document.getElementById("weatherIcon");
+        const descEl = document.getElementById("weatherDesc");
+
+        if (tempEl)
+            tempEl.textContent =
+                (temp !== null && temp !== undefined)
+                    ? `${Math.round(Number(temp))}°`
+                    : "--°";
+
+        if (locEl)
+            locEl.textContent = location ?? "현재 위치";
+
+        const weather = pickWeatherIcon({ SKY, PTY });
+
+        if (iconEl) iconEl.textContent = weather.icon;
+        if (descEl) descEl.textContent = weather.desc;
+    }
+
+    function pickWeatherIcon({ SKY, PTY }) {
+
+        const pty = Number(PTY ?? 0);
+        const sky = Number(SKY ?? 1);
+
+        if ([1,4,5].includes(pty))
+            return { icon: "☔️", desc: "비" };
+
+        if ([2,6].includes(pty))
+            return { icon: "🌨️", desc: "비/눈" };
+
+        if ([3,7].includes(pty))
+            return { icon: "❄️", desc: "눈" };
+
+        if (sky === 1)
+            return { icon: "☀️", desc: "맑음" };
+
+        if (sky === 3)
+            return { icon: "☁️", desc: "구름많음" };
+
+        return { icon: "☁️", desc: "흐림" };
+    }
+
+
+
+    function updateWeatherBanner({ SKY, PTY }) {
+
+        const imgEl = document.getElementById("weatherBannerImg");
+        if (!imgEl) return;
+
+        const pty = Number(PTY ?? 0);
+        const sky = Number(SKY ?? 1);
+
+        let img = "images/weather/4.png";
+
+        if ([1,4,5].includes(pty)) img = "images/weather/1.png";
+        else if ([2,6].includes(pty)) img = "images/weather/2.png";
+        else if ([3,7].includes(pty)) img = "images/weather/3.png";
+        else if (sky === 3) img = "images/weather/5.png";
+        else if (sky === 4) img = "images/weather/6.png";
+
+        imgEl.src = img;
+    }
+
+    function renderWeather(data) {
+
+        renderWeatherOverlay({
+            temp: data.temp,
+            location: data.location,
+            SKY: data.sky,
+            PTY: data.pty
+        });
+
+        updateWeatherBanner({
+            SKY: data.sky,
+            PTY: data.pty
         });
     }
 

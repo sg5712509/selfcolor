@@ -1084,7 +1084,7 @@
     <!-- 가운데 긴 배너 (오른쪽에 이미지) -->
     <div class="panel banner banner-wrap">
         <div class="text banner-left">
-            <img src="/images/time/3.png" alt="배너 이미지"/>
+            <img id="timeBannerImg" src="/images/time/3.png" alt="배너 이미지"/>
 
             <!-- 시계 오버레이 -->
             <div class="banner-clock">
@@ -2325,6 +2325,34 @@
             closeProfileModal();
         });
     }
+
+    function pickTimeImageNoByHour(hour) {
+        // 너가 원하는 규칙으로 바꾸면 됨
+        // 예시: 1~6 중 하나 선택
+        if (hour >= 6 && hour < 10) return 1;
+        if (hour >= 10 && hour < 14) return 2;
+        if (hour >= 14 && hour < 18) return 3;
+        if (hour >= 18 && hour < 22) return 4;
+        if (hour >= 22 || hour < 2) return 5;
+        return 6;
+    }
+
+    function renderTimeBanner() {
+        const img = document.getElementById("timeBannerImg");
+        if (!img) return;
+
+        const hour = new Date().getHours();
+        const no = pickTimeImageNoByHour(hour);
+
+        img.src = `images/time/${no}.png`;
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        renderTimeBanner();
+        // 1분마다 갱신하고 싶으면
+        setInterval(renderTimeBanner, 60 * 1000);
+    });
+
 
 </script>
 
