@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.example.demo.domain.mapper.OutfitMapper">
+
+    <select id="findRandomOne" resultType="com.example.demo.domain.Outfit">
+        SELECT
+            id,
+            title,
+            summary,
+            image_url AS imageUrl
+            FROM outfit
+            ORDER BY RAND()
+        LIMIT 1
+    </select>
+
+</mapper>

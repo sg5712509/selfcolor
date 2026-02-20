@@ -4,6 +4,7 @@ import com.example.demo.domain.Banner;
 import com.example.demo.domain.CustomPropertyConfig;
 import com.example.demo.domain.service.BannerService;
 import com.example.demo.domain.service.HomeService;
+import com.example.demo.domain.service.OutfitService;
 import com.example.demo.domain.service.WeatherBannerService;
 import com.example.demo.domain.weather.WeatherDto;
 import lombok.RequiredArgsConstructor;
@@ -30,6 +31,7 @@ public class HomeController {
     private final UserService userService;
     private final BannerService bannerService;
     private final WeatherBannerService weatherBannerService;
+    private final OutfitService outfitService;
 
     @GetMapping("/")
     public String home(Model model, HttpSession session) {
@@ -67,6 +69,8 @@ public class HomeController {
 
         WeatherDto weatherDto = new WeatherDto(0, "현재 위치", 1, 0); // view 가 깨지지 않게 해주는 코드
         model.addAttribute("weather", weatherDto); // weather 란 이름으로 html 에 전달
+
+        model.addAttribute("todayOutfit", outfitService.getTodayOutfit());
 
         return "index";
     }
