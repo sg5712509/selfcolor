@@ -1,0 +1,454 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Diary</title>
+
+    <style>
+        :root{
+          --bg:#0b0d12;
+          --card:#121726;
+          --line:#232b40;
+          --text:#e9ecf5;
+          --muted:#a9b1c7;
+          --accent:#7c5cff;
+          --accent2:#2dd4bf;
+          --danger:#ff4d6d;
+          --shadow: 0 10px 30px rgba(0,0,0,.35);
+          --radius: 16px;
+        }
+        *{box-sizing:border-box}
+        body{
+          margin:0;
+          font-family: system-ui, -apple-system, "Segoe UI", Roboto, "Noto Sans KR", Arial, sans-serif;
+          background: radial-gradient(1200px 700px at 20% 0%, rgba(124,92,255,.25), transparent 55%),
+                      radial-gradient(900px 600px at 90% 10%, rgba(45,212,191,.18), transparent 50%),
+                      var(--bg);
+          color:var(--text);
+        }
+        .wrap{
+          max-width: 1100px;
+          margin: 32px auto;
+          padding: 0 16px 40px;
+        }
+        header{
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap:12px;
+          margin-bottom: 18px;
+        }
+        .title{
+          display:flex;
+          flex-direction:column;
+          gap:6px;
+        }
+        .title h1{
+          margin:0;
+          font-size: 26px;
+          letter-spacing: -.3px;
+        }
+        .title p{
+          margin:0;
+          color:var(--muted);
+          font-size: 14px;
+        }
+
+        .card{
+          background: linear-gradient(180deg, rgba(18,23,38,.95), rgba(18,23,38,.75));
+          border: 1px solid var(--line);
+          border-radius: var(--radius);
+          box-shadow: var(--shadow);
+          overflow:hidden;
+        }
+
+        .toolbar{
+          display:flex;
+          align-items:center;
+          justify-content:space-between;
+          gap: 12px;
+          padding: 14px 16px;
+          border-bottom: 1px solid var(--line);
+        }
+        .toolbar .month{
+          display:flex;
+          align-items:center;
+          gap: 10px;
+          font-weight: 700;
+        }
+        .btn{
+          appearance:none;
+          border:1px solid var(--line);
+          background: rgba(255,255,255,.03);
+          color: var(--text);
+          padding: 8px 12px;
+          border-radius: 12px;
+          cursor:pointer;
+          transition: .15s ease;
+          font-weight:600;
+          text-decoration:none;
+          display:inline-flex;
+          align-items:center;
+          gap:8px;
+        }
+        .btn:hover{ transform: translateY(-1px); border-color: rgba(124,92,255,.6); }
+        .btn.primary{
+          border-color: rgba(124,92,255,.55);
+          background: rgba(124,92,255,.18);
+        }
+
+        .grid{
+          display:grid;
+          grid-template-columns: 1.2fr .8fr;
+          gap: 16px;
+          margin-top: 16px;
+        }
+
+        /* Calendar */
+        .calendar{
+          padding: 16px;
+        }
+        .dow{
+          display:grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 10px;
+          color: var(--muted);
+          font-size: 12px;
+          margin-bottom: 10px;
+          text-align:center;
+        }
+        .dates{
+          display:grid;
+          grid-template-columns: repeat(7, 1fr);
+          gap: 10px;
+        }
+        .day{
+          position:relative;
+          min-height: 92px;
+          border:1px solid var(--line);
+          border-radius: 14px;
+          padding: 10px;
+          background: rgba(255,255,255,.02);
+          cursor:pointer;
+          transition: .12s ease;
+        }
+        .day:hover{ border-color: rgba(45,212,191,.55); transform: translateY(-1px); }
+        .day.muted{
+          opacity:.35;
+          cursor:default;
+        }
+        .day .num{
+          font-weight:800;
+          font-size: 14px;
+          opacity:.95;
+        }
+        .badges{
+          display:flex;
+          flex-wrap:wrap;
+          gap:6px;
+          margin-top:8px;
+        }
+        .badge{
+          font-size: 11px;
+          padding: 4px 7px;
+          border-radius: 999px;
+          border:1px solid var(--line);
+          color: var(--muted);
+          background: rgba(255,255,255,.02);
+          line-height: 1;
+        }
+        .badge.ok{
+          border-color: rgba(45,212,191,.55);
+          color: #baf7ee;
+          background: rgba(45,212,191,.12);
+        }
+        .badge.warn{
+          border-color: rgba(255,77,109,.55);
+          color: #ffd0d9;
+          background: rgba(255,77,109,.12);
+        }
+        .selected{
+          outline: 2px solid rgba(124,92,255,.75);
+          box-shadow: 0 0 0 6px rgba(124,92,255,.12);
+        }
+
+        /* Side form */
+        .side{
+          padding: 16px;
+        }
+        .side h2{
+          margin:0 0 12px;
+          font-size: 18px;
+        }
+        .field{
+          display:flex;
+          flex-direction:column;
+          gap:8px;
+          margin-bottom: 12px;
+        }
+        label{
+          font-size: 12px;
+          color: var(--muted);
+        }
+        input, textarea, select{
+          width:100%;
+          padding: 10px 12px;
+          border-radius: 12px;
+          border:1px solid var(--line);
+          background: rgba(0,0,0,.22);
+          color: var(--text);
+          outline:none;
+        }
+        textarea{ min-height: 110px; resize: vertical; }
+        .row{
+          display:grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 10px;
+        }
+        .hint{
+          color: var(--muted);
+          font-size: 12px;
+          margin-top: -6px;
+          margin-bottom: 10px;
+        }
+        .actions{
+          display:flex;
+          gap:10px;
+          align-items:center;
+          margin-top: 10px;
+        }
+        .danger{
+          border-color: rgba(255,77,109,.55);
+          background: rgba(255,77,109,.10);
+        }
+
+        /* Responsive */
+        @media (max-width: 900px){
+          .grid{ grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+
+<body>
+<div class="wrap">
+
+    <header>
+        <div class="title">
+            <h1>📅 다이어리</h1>
+            <p>달력에서 날짜를 눌러서 식단/운동/메모를 기록해!</p>
+        </div>
+
+        <div style="display:flex; gap:10px; align-items:center;">
+            <a class="btn" href="/">🏠 홈</a>
+            <a class="btn primary" th:href="@{/diary}">🔄 새로고침</a>
+        </div>
+    </header>
+
+    <div class="card">
+        <div class="toolbar">
+            <!-- month/year는 서버에서 내려줘도 되고, 일단은 기본값 표시 -->
+            <div class="month">
+                <button class="btn" type="button" id="prevBtn">⬅️</button>
+                <span id="monthLabel" style="min-width:140px; text-align:center;">2026년 2월</span>
+                <button class="btn" type="button" id="nextBtn">➡️</button>
+            </div>
+
+            <div style="display:flex; gap:10px; align-items:center;">
+                <button class="btn" type="button" id="todayBtn">오늘</button>
+                <button class="btn danger" type="button" id="clearBtn">선택 초기화</button>
+            </div>
+        </div>
+
+        <div class="grid">
+            <!-- Calendar -->
+            <section class="calendar">
+                <div class="dow">
+                    <div>일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div>토</div>
+                </div>
+
+                <div class="dates" id="dates">
+                    <!-- JS로 날짜 렌더링 -->
+                </div>
+            </section>
+
+            <!-- Side -->
+            <aside class="side">
+                <h2>📝 기록하기</h2>
+
+                <div class="hint">
+                    날짜 선택 후 작성하면 저장 버튼 누르는 방식 (DB 연결되면 POST로 저장하면 됨)
+                </div>
+
+                <!-- ✅ 일단 화면 깨짐 방지 + 추후 서버 연동 대비 form -->
+                <form method="post" th:action="@{/diary/save}">
+                    <div class="field">
+                        <label>선택한 날짜</label>
+                        <input type="text" id="selectedDate" name="date" placeholder="날짜를 선택하세요" readonly />
+                    </div>
+
+                    <div class="row">
+                        <div class="field">
+                            <label>체중(kg)</label>
+                            <input type="number" step="0.1" name="weight" placeholder="예: 52.3" />
+                        </div>
+                        <div class="field">
+                            <label>운동(분)</label>
+                            <input type="number" name="workoutMinutes" placeholder="예: 40" />
+                        </div>
+                    </div>
+
+                    <div class="field">
+                        <label>뭐 먹었는지</label>
+                        <textarea name="meals" placeholder="예: 샐러드 + 닭가슴살 / 라떼 1잔"></textarea>
+                    </div>
+
+                    <div class="field">
+                        <label>메모</label>
+                        <textarea name="memo" placeholder="예: 오늘 컨디션, 기분, 하고싶은 말"></textarea>
+                    </div>
+
+                    <div class="actions">
+                        <button class="btn primary" type="submit">💾 저장</button>
+                        <button class="btn" type="button" id="mockFillBtn">⚡ 예시 채우기</button>
+                    </div>
+
+                    <div class="hint" style="margin-top:10px;">
+                        ⚠️ 지금은 `/diary/save` 컨트롤러가 없으면 404/에러 날 수 있음 → 만들거나 action을 비워둬도 됨!
+                    </div>
+                </form>
+            </aside>
+        </div>
+    </div>
+</div>
+
+<script>
+    // ✅ 기본: 달력 렌더링 (클라에서만)
+    // 서버 렌더링으로 바꿔도 되고, 지금은 일단 "예쁘게 보이게" + "날짜 선택"에 초점 🎯
+
+    const datesEl = document.getElementById('dates');
+    const monthLabel = document.getElementById('monthLabel');
+    const selectedDateInput = document.getElementById('selectedDate');
+
+    const todayBtn = document.getElementById('todayBtn');
+    const clearBtn = document.getElementById('clearBtn');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const mockFillBtn = document.getElementById('mockFillBtn');
+
+    // 기본 월: 2026-02
+    let viewYear = 2026;
+    let viewMonth = 1; // JS month: 0=1월, 1=2월
+    let selectedKey = null;
+
+    function pad(n){ return String(n).padStart(2,'0'); }
+
+    function render(){
+      datesEl.innerHTML = '';
+      monthLabel.textContent = `${viewYear}년 ${viewMonth + 1}월`;
+
+      const first = new Date(viewYear, viewMonth, 1);
+      const last = new Date(viewYear, viewMonth + 1, 0);
+      const startDow = first.getDay(); // 0=일
+      const totalDays = last.getDate();
+
+      // 앞 빈칸
+      for(let i=0;i<startDow;i++){
+        const d = document.createElement('div');
+        d.className = 'day muted';
+        datesEl.appendChild(d);
+      }
+
+      // 날짜
+      for(let day=1; day<=totalDays; day++){
+        const cell = document.createElement('div');
+        cell.className = 'day';
+
+        const key = `${viewYear}-${pad(viewMonth+1)}-${pad(day)}`;
+        cell.dataset.key = key;
+
+        // 숫자
+        const num = document.createElement('div');
+        num.className = 'num';
+        num.textContent = day;
+        cell.appendChild(num);
+
+        // 뱃지 (예시: 나중에 서버 데이터로 치환)
+        const badges = document.createElement('div');
+        badges.className = 'badges';
+
+        // 랜덤 예시 뱃지 (보기 좋게만)
+        if(day % 6 === 0){
+          const b = document.createElement('div');
+          b.className = 'badge ok';
+          b.textContent = '운동';
+          badges.appendChild(b);
+        }
+        if(day % 9 === 0){
+          const b = document.createElement('div');
+          b.className = 'badge warn';
+          b.textContent = '폭식주의';
+          badges.appendChild(b);
+        }
+        if(badges.children.length) cell.appendChild(badges);
+
+        // 오늘 표시
+        const now = new Date();
+        const isToday = (now.getFullYear() === viewYear && now.getMonth() === viewMonth && now.getDate() === day);
+        if(isToday){
+          cell.style.borderColor = 'rgba(124,92,255,.75)';
+        }
+
+        // 선택 상태
+        if(selectedKey === key){
+          cell.classList.add('selected');
+        }
+
+        cell.addEventListener('click', () => {
+          selectedKey = key;
+          selectedDateInput.value = key;
+          render();
+        });
+
+        datesEl.appendChild(cell);
+      }
+    }
+
+    todayBtn.addEventListener('click', () => {
+      const now = new Date();
+      viewYear = now.getFullYear();
+      viewMonth = now.getMonth();
+      selectedKey = `${viewYear}-${pad(viewMonth+1)}-${pad(now.getDate())}`;
+      selectedDateInput.value = selectedKey;
+      render();
+    });
+
+    clearBtn.addEventListener('click', () => {
+      selectedKey = null;
+      selectedDateInput.value = '';
+      render();
+    });
+
+    prevBtn.addEventListener('click', () => {
+      viewMonth--;
+      if(viewMonth < 0){ viewMonth = 11; viewYear--; }
+      render();
+    });
+
+    nextBtn.addEventListener('click', () => {
+      viewMonth++;
+      if(viewMonth > 11){ viewMonth = 0; viewYear++; }
+      render();
+    });
+
+    mockFillBtn.addEventListener('click', () => {
+      document.querySelector('input[name="weight"]').value = "52.3";
+      document.querySelector('input[name="workoutMinutes"]').value = "40";
+      document.querySelector('textarea[name="meals"]').value = "점심: 샐러드 + 닭가슴살\n저녁: 두부김치\n간식: 아메리카노";
+      document.querySelector('textarea[name="memo"]').value = "컨디션 좋음. 단 거 땡겼는데 참음 👍";
+    });
+
+    render();
+</script>
+</body>
+</html>

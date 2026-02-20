@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>다이어리 달력</title>
+    <style>
+        body{font-family:system-ui,-apple-system,"Noto Sans KR"; margin:0; background:#0b0d12; color:#e9ecf5;}
+        .wrap{max-width:1100px; margin:28px auto; padding:0 16px;}
+        .card{background:#121726; border:1px solid #232b40; border-radius:16px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
+        .toolbar{display:flex; justify-content:space-between; align-items:center; padding:14px 16px; border-bottom:1px solid #232b40; gap:10px; flex-wrap:wrap;}
+        .btn{display:inline-flex; gap:8px; align-items:center; padding:10px 12px; border-radius:12px; border:1px solid #232b40; background:rgba(255,255,255,.03); color:#e9ecf5; text-decoration:none; cursor:pointer;}
+        .month{font-weight:800;}
+        .grid{display:grid; grid-template-columns:repeat(7, 1fr); gap:10px; padding:16px;}
+        .dow{color:#a9b1c7; font-size:12px; text-align:center; padding:10px 0 0;}
+        .day{min-height:110px; border:1px solid #232b40; border-radius:14px; padding:10px; background:rgba(255,255,255,.02); position:relative;}
+        .num{font-weight:800; font-size:14px;}
+        .snippet{margin-top:8px; color:#a9b1c7; font-size:12px; line-height:1.35; max-height:52px; overflow:hidden;}
+        .has{border-color:rgba(45,212,191,.55); background:rgba(45,212,191,.08);}
+        .empty{opacity:.55;}
+        .link{position:absolute; inset:0; border-radius:14px;}
+        .pad{background:transparent; border:none;}
+    </style>
+</head>
+<body>
+<div class="wrap">
+
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap; margin-bottom:12px;">
+        <div>
+            <h2 style="margin:0;">📅 다이어리 달력</h2>
+            <div style="color:#a9b1c7; font-size:13px;">날짜별로 일기 요약이 보이고, 누르면 해당 날짜 일기로 이동해요.</div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn" href="/">🏠 홈</a>
+            <a class="btn" th:href="@{/diary/write}">📝 일기 쓰기</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="toolbar">
+            <div style="display:flex; gap:10px; align-items:center; flex-wrap:wrap;">
+                <a class="btn"
+                   th:href="@{/diary/calendar(year=${month==1 ? year-1 : year}, month=${month==1 ? 12 : month-1})}">⬅️ 이전달</a>
+
+                <div class="month" th:text="${year} + '년 ' + ${month} + '월'">2026년 2월</div>
+
+                <a class="btn"
+                   th:href="@{/diary/calendar(year=${month==12 ? year+1 : year}, month=${month==12 ? 1 : month+1})}">➡️ 다음달</a>
+            </div>
+
+            <a class="btn" th:href="@{/diary/calendar}">오늘 달</a>
+        </div>
+
+        <div class="grid" style="padding-top:8px;">
+            <div class="dow">일</div><div class="dow">월</div><div class="dow">화</div><div class="dow">수</div><div class="dow">목</div><div class="dow">금</div><div class="dow">토</div>
+        </div>
+
+        <div class="grid" style="padding-top:0;">
+            <!-- 앞쪽 빈칸(요일 맞추기) -->
+            <div th:each="i : ${#numbers.sequence(1, startDow)}" class="day pad"></div>
+
+            <!-- 날짜 -->
+            <div th:each="d : ${#numbers.sequence(1, daysInMonth)}"
+                 th:with="date=${T(java.time.LocalDate).of(year, month, d)},
+                    diary=${diaryMap[date]}"
+                 th:class="'day ' + (${diary} != null ? 'has' : 'empty')">
+
+                <div class="num" th:text="${d}">1</div>
+
+                <div class="snippet" th:if="${diary != null}">
+                    <div th:text="${diary.title != null && !#strings.isEmpty(diary.title) ? diary.title : '(제목 없음)'}"></div>
+                    <div th:text="${diary.content != null ? #strings.abbreviate(diary.content, 70) : ''}"></div>
+                </div>
+
+                <div class="snippet" th:if="${diary == null}">
+                    (일기 없음) 클릭해서 작성하기
+                </div>
+
+                <!-- ✅ 클릭하면 write 페이지로 이동 -->
+                <a class="link" th:href="@{/diary/write(date=${date})}" aria-label="open"></a>
+            </div>
+        </div>
+    </div>
+
+</div>
+</body>
+</html>

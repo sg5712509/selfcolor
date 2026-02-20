@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1"/>
+    <title>일기 쓰기</title>
+    <style>
+        body{font-family:system-ui,-apple-system,"Noto Sans KR"; margin:0; background:#0b0d12; color:#e9ecf5;}
+        .wrap{max-width:960px; margin:28px auto; padding:0 16px;}
+        .card{background:#121726; border:1px solid #232b40; border-radius:16px; padding:18px; box-shadow:0 10px 30px rgba(0,0,0,.35);}
+        .top{display:flex; justify-content:space-between; align-items:center; gap:10px; flex-wrap:wrap;}
+        a.btn, button.btn{display:inline-flex; gap:8px; align-items:center; padding:10px 12px; border-radius:12px; border:1px solid #232b40; background:rgba(255,255,255,.03); color:#e9ecf5; text-decoration:none; cursor:pointer;}
+        .btn.primary{border-color:rgba(124,92,255,.6); background:rgba(124,92,255,.18);}
+        input, textarea{width:100%; padding:10px 12px; border-radius:12px; border:1px solid #232b40; background:rgba(0,0,0,.25); color:#e9ecf5; outline:none;}
+        textarea{min-height:220px; resize:vertical;}
+        .row{display:grid; grid-template-columns:1fr 1fr; gap:10px;}
+        .muted{color:#a9b1c7; font-size:13px;}
+        .tag{display:inline-block; padding:6px 10px; border-radius:999px; border:1px solid #232b40; color:#a9b1c7; background:rgba(255,255,255,.02); font-size:12px;}
+        @media (max-width:720px){.row{grid-template-columns:1fr;}}
+    </style>
+</head>
+<body>
+<div class="wrap">
+    <div class="top" style="margin-bottom:12px;">
+        <div>
+            <h2 style="margin:0;">📝 일기 쓰기</h2>
+            <div class="muted">날짜를 선택하면 해당 날짜 일기를 불러오거나 새로 작성할 수 있어요.</div>
+        </div>
+        <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <a class="btn" href="/">🏠 홈</a>
+            <a class="btn" th:href="@{/diary/calendar}">📅 달력 보기</a>
+        </div>
+    </div>
+
+    <div class="card">
+        <div class="row" style="align-items:end; margin-bottom:14px;">
+            <div>
+                <label class="muted">날짜 선택</label>
+                <input type="date" id="datePicker" th:value="${targetDate}" />
+            </div>
+            <div>
+                <div class="muted">상태</div>
+                <span class="tag" th:if="${isNew}">새 일기 ✨</span>
+                <span class="tag" th:unless="${isNew}">불러온 일기 ✅</span>
+            </div>
+        </div>
+
+        <form method="post" th:action="@{/diary/write}">
+            <input type="hidden" name="diaryDate" th:value="${targetDate}" />
+
+            <div style="margin-bottom:10px;">
+                <label class="muted">제목</label>
+                <input name="title" placeholder="제목" th:value="${diary.title}" />
+            </div>
+
+            <div style="margin-bottom:12px;">
+                <label class="muted">내용</label>
+                <textarea name="content" placeholder="오늘 있었던 일을 적어줘요" th:text="${diary.content}"></textarea>
+            </div>
+
+            <div style="display:flex; gap:10px; flex-wrap:wrap;">
+                <button class="btn primary" type="submit">💾 저장</button>
+                <a class="btn" th:href="@{/diary/write(date=${targetDate})}">🔄 다시 불러오기</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script>
+    const picker = document.getElementById("datePicker");
+    picker.addEventListener("change", () => {
+      if (!picker.value) return;
+      location.href = `/diary/write?date=${picker.value}`;
+    });
+</script>
+</body>
+</html>

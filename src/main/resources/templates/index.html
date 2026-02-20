@@ -1313,12 +1313,12 @@
     <div class="panel outfit-mini">
         <div class="outfit-mini__header">
             <h3>🪄 오늘 뭐 입지?</h3>
-            <a class="outfit-mini__link" th:href="@{/diary}">다이어리 쓰기 →</a>
+            <a class="outfit-mini__link" th:href="@{/diary/calendar}">다이어리 쓰기 →</a>
         </div>
 
         <div class="outfit-mini__content">
             <!-- 추천 코디 카드(작게) -->
-            <a class="outfit-mini__card" th:href="@{/diary(date=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')})}">
+            <a class="outfit-mini__card" th:href="@{/diary(date=${#dath:href 로tes.format(#dates.createNow(), 'yyyy-MM-dd')})}">
                 <img class="outfit-mini__img"
                      th:src="${todayOutfit != null ? todayOutfit.imageUrl : '/images/outfit/default.png'}"
                      alt="오늘의 코디"/>
@@ -1339,7 +1339,7 @@
             <div class="outfit-mini__actions">
                 <a class="btn-mini" th:href="@{/(refreshOutfit=true)}">🔄 다시 추천</a>
                 <a class="btn-mini btn-mini--primary"
-                   th:href="@{/diary(date=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')})}">
+                   th:href="@{/diary/write}">
                     ✍️ 일기 쓰러 가기
                 </a>
             </div>
