@@ -1318,7 +1318,7 @@
 
         <div class="outfit-mini__content">
             <!-- 추천 코디 카드(작게) -->
-            <a class="outfit-mini__card" th:href="@{/diary(date=${#dath:href 로tes.format(#dates.createNow(), 'yyyy-MM-dd')})}">
+            <a class="outfit-mini__card" th:href="@{/diary(date=${#dates.format(#dates.createNow(), 'yyyy-MM-dd')})}">
                 <img class="outfit-mini__img"
                      th:src="${todayOutfit != null ? todayOutfit.imageUrl : '/images/outfit/default.png'}"
                      alt="오늘의 코디"/>
