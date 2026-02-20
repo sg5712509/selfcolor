@@ -58,7 +58,7 @@ public class DiaryController {
 
         model.addAttribute("targetDate", target);
         model.addAttribute("diary", diary);
-        return "diary_write"; // templates/write.html
+        return "diary/write"; // templates/write.html
     }
 
     // ✅ 저장 (없으면 INSERT, 있으면 UPDATE)
@@ -103,6 +103,6 @@ public class DiaryController {
         model.addAttribute("daysInMonth", ym.lengthOfMonth());
         model.addAttribute("diaryMap", diaryMap);
 
-        return "diary_calendar"; // templates/calendar.html
+        return "diary/calendar"; // templates/calendar.html
     }
 }
