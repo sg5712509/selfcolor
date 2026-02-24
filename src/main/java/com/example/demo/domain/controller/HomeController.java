@@ -159,7 +159,7 @@ public class HomeController {
         // "https://kauth.kakao.com/oauth/logout" : 카카오 개발자 문서에 적혀 있는 OAuth 로그아웃 엔드포인트이다.
         String url = "https://kauth.kakao.com/oauth/logout"
                 + "?client_id=" + enc(customPropertyConfig.getKakaoClientId())
-                + "&logout_redirect_uri=" + enc("http://localhost:8080/");
+                + "&logout_redirect_uri=" + enc(customPropertyConfig.getKakaoLogoutRedirectUri());
         // properties 로 뺴야함 (배포시 터짐)
         return new RedirectView(url);
     }

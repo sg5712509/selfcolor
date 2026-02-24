@@ -5,6 +5,10 @@ import lombok.Setter;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 
 
+
+
+
+
 @Getter
 @Setter
 @ConfigurationProperties(prefix = "custom.property")
@@ -20,4 +24,8 @@ public class CustomPropertyConfig {
     private String naverRedirectUri;
     private String weatherKey;
     private String kakaoRestKey;
+
+
+    // ✅ 추가
+    private String kakaoLogoutRedirectUri;
 }
